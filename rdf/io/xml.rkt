@@ -13,8 +13,9 @@
          rdf/core/dataset
          rdf/core/graph
          rdf/core/literal
-         rdf/core/namespace
+         rdf/core/nsname
          rdf/core/nsmap
+         rdf/core/resource
          rdf/core/statement
          rdf/core/triple
          rdf/core/v/rdf
@@ -76,31 +77,31 @@
          ((eq? (attribute-name att) 'lang)
           (hash-set! context 'lang (attribute-value att)))
          ((eq? (attribute-name att) 'base)
-          (let* ((base-url-str (attribute-value att))
-                 (base-url (string->url base-url-str)))
-            (if (url-absolute? base-url)
-                (hash-set! context 'base base-url)
-                (raise-representation-read-error 'xml "url-absolute?" base-url-str))))))
+          (let* ((base-resource-str (attribute-value att))
+                 (base-resource (string->resource base-resource-str)))
+            (if (resource-absolute? base-resource)
+                (hash-set! context 'base base-resource)
+                (raise-representation-read-error 'xml "resource-absolute?" base-resource-str))))))
      (element-attributes elt))
     context))
 
-(define (string->absolute-url s ctx)
-  (let ((url (string->url s))
+(define (string->absolute-resource s ctx)
+  (let ((resource (string->resource s))
         (base (hash-ref ctx 'base #f)))
-    (if (url-absolute? url)
-        url
+    (if (resource-absolute? resource)
+        resource
         (if base
             (combine-url/relative base s)
-            (raise-representation-read-error 'xml "url-absolute?" s)))))
+            (raise-representation-read-error 'xml "resource-absolute?" s)))))
 
-(define (xmlns-name->url attr-or-elt)
+(define (xmlns-name->resource attr-or-elt)
   (let ((ns+name (cond
     ((attribute? attr-or-elt)
      (list (attribute-namespace attr-or-elt) (attribute-name attr-or-elt)))
     ((element? attr-or-elt)
      (list (element-namespace attr-or-elt) (element-name attr-or-elt)))
     (else #f))))
-    (string->url
+    (string->resource
      (string-append (car ns+name)
                     (symbol->string (cadr ns+name))))))
 
@@ -118,9 +119,9 @@
            (λ (att)
              (cond
                ((rdf-attribute? att 'resource)
-                (cons 'resource (string->absolute-url (attribute-value att) ctx)))
+                (cons 'resource (string->absolute-resource (attribute-value att) ctx)))
                ((rdf-attribute? att 'about)
-                (cons 'ID (string->absolute-url (string-append "#" (attribute-value att)) ctx)))
+                (cons 'ID (string->absolute-resource (string-append "#" (attribute-value att)) ctx)))
                ((rdf-attribute? att 'nodeID)
                 (cons 'nodeID (make-blank-node (attribute-value att))))
                (else #false)))
@@ -136,7 +137,7 @@
                                  (filter pcdata? (element-content elt))))))
          (cond
            ((not (empty? datatype))
-            (make-typed-literal pcd-string (string->url (attribute-value (car datatype)))))
+            (make-typed-literal pcd-string (string->resource (attribute-value (car datatype)))))
            (lang
             (make-lang-string-literal pcd-string lang))
            (else (make-untyped-literal pcd-string)))))
@@ -152,9 +153,9 @@
            (λ (att)
              (cond
                ((rdf-attribute? att 'about)
-                (cons 'about (string->absolute-url (attribute-value att) ctx)))
+                (cons 'about (string->absolute-resource (attribute-value att) ctx)))
                ((rdf-attribute? att 'ID)
-                (cons 'ID (string->absolute-url (string-append "#" (attribute-value att)) ctx)))
+                (cons 'ID (string->absolute-resource (string-append "#" (attribute-value att)) ctx)))
                ((rdf-attribute? att 'nodeID)
                 (cons 'nodeID (make-blank-node (attribute-value att))))
                (else #false)))
@@ -173,16 +174,16 @@
     (append
      (if (not description?)
          (list (triple subject
-                       (nsname->url rdf:type)
-                       (xmlns-name->url elt)))
+                       (nsname->resource rdf:type)
+                       (xmlns-name->resource elt)))
          '())
      (map
-      (λ (att) (triple subject (xmlns-name->url att) (attribute->object att ctx)))
+      (λ (att) (triple subject (xmlns-name->resource att) (attribute->object att ctx)))
       (filter
        (λ (att) (not (special-attribute? att)))
        (element-attributes elt)))
      (map
-      (λ (elt) (triple subject (xmlns-name->url elt) (property-element->object elt (context-from elt ctx))))
+      (λ (elt) (triple subject (xmlns-name->resource elt) (property-element->object elt (context-from elt ctx))))
       (filter element? (element-content elt))))))
 
 (define (document->statements doc)
@@ -200,12 +201,16 @@
 ;; Internal Writer
 ;; -------------------------------------------------------------------------------------------------
 
+(define (namespace->string ns)
+  (nsname->resource
+   (resource->string ns)))
+
 (define (prefix+namespace->attribute prefix+ns)
   (let ((prefix (car prefix+ns))
         (namespace (cdr prefix+ns)))
     (make-xmlns-attribute
-     (namespace->string namespace)
-     #:prefix (if prefix (prefix->name-string prefix) prefix))))
+     ((namespace->string namespace)
+     #:prefix (if prefix (prefix->name-string prefix) prefix)))))
 
 (define (nsmap->xmlns nsmap)
   (let ((initial-list (map prefix+namespace->attribute
@@ -222,10 +227,10 @@
 
 (define (type-attributes object)
   (cond
-    ((url? object)
+    ((resource? object)
      (list (make-attribute #f #f
                            'rdf:resource
-                           (url->string object))))
+                           (resource->string object))))
     ((blank-node? object)
      (list (make-attribute #f #f
                            'rdf:nodeID
@@ -235,15 +240,15 @@
     ((and (literal? object) (has-datatype-iri? object))
      (list (make-attribute #f #f
                            'rdf:datatype
-                           (url->string (literal-datatype-iri object)))))
+                           (resource->string (literal-datatype-iri object)))))
     (else '())))
 
 (define (xml-property predicate object nsmap)
-  (let* ((ns+name (url->namespace+name predicate))
-         (ns-url (car ns+name))
-         (ns-prefix (nsmap-prefix-ref nsmap (url->namespace ns-url)))
+  (let* ((ns+name (resource->namespace+name predicate))
+         (ns-resource (car ns+name))
+         (ns-prefix (nsmap-prefix-ref nsmap (resource-namespace ns-resource)))
          (ns-attr (if (false? ns-prefix)
-                      (list (make-xmlns-attribute (url->string ns-url)))
+                      (list (make-xmlns-attribute (resource->string ns-resource)))
                       (list)))
          (name (if (false? ns-prefix)
                    (cdr ns+name)
@@ -261,7 +266,7 @@
                      (make-attribute #f #f
                                      'rdf:nodeID (blank-node->string subject))
                      (make-attribute #f #f
-                                     'rdf:about (url->string subject)))))
+                                     'rdf:about (resource->string subject)))))
     (make-element
      #f #f
      'rdf:Description

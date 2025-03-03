@@ -6,6 +6,7 @@
          net/url-string
          ;; --------------------------------------
          rdf/core/literal
+         rdf/core/resource
          rdf/core/statement
          rdf/core/triple
          ;; --------------------------------------
@@ -33,9 +34,9 @@
       'ntriples
       (list
        (triple
-        (string->url "http://example.com/p/me")
-        (string->url "http://www.w3.org/1999/02/22-rdf-syntax-ns#type")
-        (string->url "http://xmlns.com/foaf/0.1/Person")))))
+        (string->resource "http://example.com/p/me")
+        (string->resource "http://www.w3.org/1999/02/22-rdf-syntax-ns#type")
+        (string->resource "http://xmlns.com/foaf/0.1/Person")))))
 
     (test-case
        "read Blank-URI-URI"
@@ -45,8 +46,8 @@
       (list
        (triple
         (make-blank-node "B1234")
-        (string->url "http://www.w3.org/1999/02/22-rdf-syntax-ns#type")
-        (string->url "http://xmlns.com/foaf/0.1/Person")))))
+        (string->resource "http://www.w3.org/1999/02/22-rdf-syntax-ns#type")
+        (string->resource "http://xmlns.com/foaf/0.1/Person")))))
 
    (test-case
        "read URI-URI-Blank"
@@ -55,8 +56,8 @@
       'ntriples
       (list
        (triple
-        (string->url "http://example.com/p/me")
-        (string->url "http://www.w3.org/1999/02/22-rdf-syntax-ns#type")
+        (string->resource "http://example.com/p/me")
+        (string->resource "http://www.w3.org/1999/02/22-rdf-syntax-ns#type")
         (make-blank-node "B1234")))))
 
    (test-case
@@ -66,8 +67,8 @@
       'ntriples
       (list
        (triple
-        (string->url "http://example.com/p/me")
-        (string->url "http://www.w3.org/1999/02/22-rdf-syntax-ns#type")
+        (string->resource "http://example.com/p/me")
+        (string->resource "http://www.w3.org/1999/02/22-rdf-syntax-ns#type")
         (make-untyped-literal "Person")))))
 
    (test-case
@@ -77,8 +78,8 @@
       'ntriples
       (list
        (triple
-        (string->url "http://example.com/p/me")
-        (string->url "http://www.w3.org/1999/02/22-rdf-syntax-ns#type")
+        (string->resource "http://example.com/p/me")
+        (string->resource "http://www.w3.org/1999/02/22-rdf-syntax-ns#type")
         (make-lang-string-literal "Person" "en")))))
 
    (test-case
@@ -88,9 +89,9 @@
       'ntriples
       (list
        (triple
-        (string->url "http://example.com/p/me")
-        (string->url "http://www.w3.org/1999/02/22-rdf-syntax-ns#type")
-        (make-typed-literal "Person" (string->url "http://www.w3.org/2001/XMLSchema#string"))))))))
+        (string->resource "http://example.com/p/me")
+        (string->resource "http://www.w3.org/1999/02/22-rdf-syntax-ns#type")
+        (make-typed-literal "Person" (string->resource "http://www.w3.org/2001/XMLSchema#string"))))))))
 
 (define ntriples-write-test-suite
   (test-suite

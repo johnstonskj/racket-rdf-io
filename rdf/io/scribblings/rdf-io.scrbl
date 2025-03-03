@@ -10,6 +10,7 @@
                      racket/port
                      rdf/core/dataset
                      rdf/core/graph
+		     rdf/core/nsname
                      rdf/core/statement
                      media-type
                      rdf/io/base
@@ -30,14 +31,15 @@
    (make-base-eval '(require net/url-string
                              rdf/core/graph
                              rdf/core/literal
+			     rdf/core/resource
                              rdf/core/triple
                              rdf/io/base
                              rdf/io/registry)
                    '(define
                      graph-about-me
                      (named-graph
-                      (string->url "http://example.com/my-graph")
-                      (statement-list
+                      (string->resource "http://example.com/my-graph")
+                      (make-statements
                         "http://example.com/p/me"
                         (list (list "http://example.com/v/people#hasFirstName"
                                (list (make-lang-string-literal "Me" "en")))

@@ -11,7 +11,8 @@
          rdf/core/graph
          rdf/core/io
          rdf/core/literal
-         rdf/core/namespace
+         rdf/core/nsname
+         rdf/core/resource
          rdf/core/triple
          rdf/core/v/rdf
          ;; --------------------------------------
@@ -25,18 +26,18 @@
 (define *example-typed-literal*
   (make-typed-literal
    "42"
-   (string->url "http://www.w3.org/2001/XMLSchema#integer")))
+   (string->resource "http://www.w3.org/2001/XMLSchema#integer")))
 
 (define *empty-dataset* (unnamed-dataset (make-hash)))
 
 (define *empty-graph* (unnamed-graph '()))
 
-(define *empty-named-graph* (named-graph (string->url "http://example.org/example/named") '()))
+(define *empty-named-graph* (named-graph (string->resource "http://example.org/example/named") '()))
 
 (define *example-graph-1*
   (named-graph
-   (string->url "http://example.com/peeps")
-   (statement-list
+   (string->resource "http://example.com/peeps")
+   (make-statements
     "http://example.com/p/me"
     (list (list "http://example.com/v/people#hasFirstName"
                 (list *example-language-literal*))
@@ -47,7 +48,7 @@
 
 (define *example-unnamed-graph-1*
   (unnamed-graph
-   (statement-list
+   (make-statements
     "http://example.com/p/me"
     (list (list "http://example.com/v/people#hasFirstName"
                 (list *example-language-literal*))
@@ -58,9 +59,9 @@
 
 (define *example-type-statement*
   (triple
-   (string->url "http://example.com/peeps")
-   (nsname->url rdf:type)
-   (string->url "http://xmlns.com/foaf/0.1/Person")))
+   (string->resource "http://example.com/peeps")
+   (nsname->resource rdf:type)
+   (string->resource "http://xmlns.com/foaf/0.1/Person")))
 
 (define (check-reader test-data-file repr-id (expected #f))
   (let* ((representation (get-representation repr-id))

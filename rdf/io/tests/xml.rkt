@@ -10,8 +10,9 @@
          rdf/core/dataset
          rdf/core/graph
          rdf/core/literal
-         rdf/core/namespace
+         rdf/core/nsname
          rdf/core/nsmap
+         rdf/core/resource
          rdf/core/statement
          rdf/core/triple
          rdf/core/v/rdf
@@ -375,11 +376,11 @@ EOXML
 EOXML
       2
       (list
-       (triple (string->url "http://example.org/thing")
-               (nsname->url rdf:type)
-               (string->url "http://example.org/stuff/1.0/Document"))
-       (triple (string->url "http://example.org/thing")
-               (string->url "http://purl.org/dc/elements/1.1/title")
+       (triple (string->resource "http://example.org/thing")
+               (nsname->resource rdf:type)
+               (string->resource "http://example.org/stuff/1.0/Document"))
+       (triple (string->resource "http://example.org/thing")
+               (string->resource "http://purl.org/dc/elements/1.1/title")
                (make-untyped-literal "A marvelous thing")))))
 
    (test-case
@@ -399,11 +400,11 @@ EOXML
 EOXML
       2
       (list
-       (triple (string->url "http://example.org/thing")
-               (nsname->url rdf:type)
-               (string->url "http://example.org/stuff/1.0/Document"))
-       (triple (string->url "http://example.org/thing")
-               (string->url "http://purl.org/dc/elements/1.1/title")
+       (triple (string->resource "http://example.org/thing")
+               (nsname->resource rdf:type)
+               (string->resource "http://example.org/stuff/1.0/Document"))
+       (triple (string->resource "http://example.org/thing")
+               (string->resource "http://purl.org/dc/elements/1.1/title")
                (make-untyped-literal "A marvelous thing")))))
 
    (test-case
@@ -424,9 +425,9 @@ EOXML
       1
       (list
        (triple
-        (string->url "http://example.org/here/#snack")
-        (string->url "http://example.org/stuff/1.0/prop")
-        (string->url "http://example.org/here/fruit/apple")))))
+        (string->resource "http://example.org/here/#snack")
+        (string->resource "http://example.org/stuff/1.0/prop")
+        (string->resource "http://example.org/here/fruit/apple")))))
 
    (test-case
        "Spec Example 17"
@@ -444,11 +445,11 @@ EOXML
 </rdf:RDF>
 EOXML
       4
-      (let ((subject (string->url "http://example.org/favourite-fruit")))
-        (list (triple subject (nsname->url rdf:type) (nsname->url rdf:Seq))
-              (triple subject (nsname->url (rdf:_ 1)) (string->url "http://example.org/banana"))
-              (triple subject (nsname->url (rdf:_ 2)) (string->url "http://example.org/apple"))
-              (triple subject (nsname->url (rdf:_ 3)) (string->url "http://example.org/pear"))))))
+      (let ((subject (string->resource "http://example.org/favourite-fruit")))
+        (list (triple subject (nsname->resource rdf:type) (nsname->resource rdf:Seq))
+              (triple subject (nsname->resource (rdf:_ 1)) (string->resource "http://example.org/banana"))
+              (triple subject (nsname->resource (rdf:_ 2)) (string->resource "http://example.org/apple"))
+              (triple subject (nsname->resource (rdf:_ 3)) (string->resource "http://example.org/pear"))))))
 
    (test-case
        "Spec Example 18"
@@ -466,11 +467,11 @@ EOXML
 </rdf:RDF>
 EOXML
       4
-      (let ((subject (string->url "http://example.org/favourite-fruit")))
-        (list (triple subject (nsname->url rdf:type) (nsname->url rdf:Seq))
-              (triple subject (nsname->url rdf:li) (string->url "http://example.org/banana"))
-              (triple subject (nsname->url rdf:li) (string->url "http://example.org/apple"))
-              (triple subject (nsname->url rdf:li) (string->url "http://example.org/pear"))))))
+      (let ((subject (string->resource "http://example.org/favourite-fruit")))
+        (list (triple subject (nsname->resource rdf:type) (nsname->resource rdf:Seq))
+              (triple subject (nsname->resource rdf:li) (string->resource "http://example.org/banana"))
+              (triple subject (nsname->resource rdf:li) (string->resource "http://example.org/apple"))
+              (triple subject (nsname->resource rdf:li) (string->resource "http://example.org/pear"))))))
 
    (test-case
        "Spec Example 19"
