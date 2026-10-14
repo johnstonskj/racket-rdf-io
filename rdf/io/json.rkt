@@ -15,6 +15,7 @@
          rdf/core/literal
          rdf/core/nsmap
          rdf/core/statement
+         rdf/core/tree
          rdf/core/triple
          ;; --------------------------------------
          media-type

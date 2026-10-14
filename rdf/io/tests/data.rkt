@@ -11,7 +11,6 @@
          rdf/core/graph
          rdf/core/io
          rdf/core/literal
-         rdf/core/namespace
          rdf/core/triple
          rdf/core/v/rdf
          ;; --------------------------------------
