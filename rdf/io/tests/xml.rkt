@@ -10,7 +10,6 @@
          rdf/core/dataset
          rdf/core/graph
          rdf/core/literal
-         rdf/core/namespace
          rdf/core/nsmap
          rdf/core/statement
          rdf/core/triple
